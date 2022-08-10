@@ -66,6 +66,29 @@ class Enemy{
     }
 }
 
+class Particle{
+    constructor(x,y,radius,color,velocity){
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+        this.color = color;
+        this.velocity = velocity;
+    }
+
+    draw(){
+        c.beginPath();
+        c.arc(this.x,this.y,this.radius,0,Math.PI * 2,false)
+        c.fillStyle = this.color;
+        c.fill();
+    }
+
+    update(){
+        this.draw();
+        this.x += this.velocity.x;
+        this.y += this.velocity.y;
+    }
+}
+
 const x = canvas.width / 2;
 const y = canvas.height / 2;
 const player = new Player(x,y,15,'white');
@@ -116,6 +139,7 @@ function animate(){
             }, 0);
         }
     })
+
     enemies.forEach((enemy , index)=>{
       enemy.update();
 
@@ -126,12 +150,23 @@ function animate(){
       projectiles.forEach((projectile, projectileIndex) => {
         //Nos da la distancia del enemigo con las balas
         const dist = Math.hypot(projectile.x - enemy.x, projectile.y - enemy.y)
+        
+        //Colision de bala con enemigo
         if(dist - enemy.radius - projectile.radius < 1){   
-            
-            setTimeout(() => {
-                enemies.splice(index,1);
-                projectiles.splice(projectileIndex,1);
-            }, 0);
+            if(enemy.radius - 5 > 5){
+                gsap.to(enemy,{
+                    radius: enemy.radius - 5
+                })
+                setTimeout(() => {
+                    projectiles.splice(projectileIndex,1);
+                }, 0);
+            } 
+            else{
+                setTimeout(() => {
+                    enemies.splice(index,1);
+                    projectiles.splice(projectileIndex,1);
+                }, 0);
+            }
         }
       })
     })
